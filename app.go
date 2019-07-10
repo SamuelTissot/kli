@@ -19,13 +19,10 @@ func (a *App) SetRoot(root *Command) {
 // usually it's the os.Args[1:]
 func (a *App) Run(ctx *Context) {
 
-	if len(ctx.Args()) < 2 {
+	if len(ctx.Args()) == 0 && a.root.fn == nil {
 		// only one argument, call the excute the root fnc right away
 		fmt.Println("no arguments, printing default")
 		a.root.PrintDefaults()
-		for _, c := range a.root.Children() {
-			c.PrintDefaults()
-		}
 		os.Exit(0)
 		return
 	}
@@ -54,10 +51,14 @@ func (a *App) Run(ctx *Context) {
 		os.Exit(1)
 	}
 
-	err := last.fn(last, first.f)
-	if err != nil {
-		log.Println(err.Error())
-		os.Exit(err.Code())
+	if last.fn == nil {
+		last.PrintDefaults()
+	} else {
+		err := last.fn(last, first.f)
+		if err != nil {
+			log.Println(err.Error())
+			os.Exit(err.Code())
+		}
 	}
 
 	os.Exit(0)

@@ -84,6 +84,10 @@ func (c *Command) PrintDefaults() {
 	fmt.Printf(" %s\n", divider)
 	fmt.Println("  ARGS:")
 	c.FlagSet.PrintDefaults()
+	//print the child default
+	for _, child := range c.Children() {
+		child.PrintDefaults()
+	}
 }
 
 // Bool sets a flag of type Bool

@@ -78,7 +78,7 @@ func TestApp_ParseSubCommands_withGlobalFlags(t *testing.T) {
 	got := string(kt.Out)
 	for _, str := range mustFind {
 		if !strings.Contains(got, str) {
-			t.Errorf("could not find \"%s\" in \"%s\"", str, got)
+			t.Errorf("could not find \"%s\" in \n%s", str, got)
 		}
 	}
 }

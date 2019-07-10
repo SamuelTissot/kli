@@ -2,6 +2,9 @@ package kli
 
 import "os"
 
+// todo create a proper context with timeout
+// that has similar functionality as the http.context
+// else it's a bit confusing
 type Context struct {
 	args []string
 }
@@ -11,13 +14,16 @@ func NewContext() *Context {
 }
 
 func (c *Context) SetArgs(args []string) *Context {
-	args = append([]string{"CDM_NAME"}, args...)
 	c.args = args
 	return c
 }
 
 func (c *Context) Default() *Context {
-	c.args = os.Args[1:]
+	//only take the arguments we don't care about the name of the command
+	if len(os.Args) > 2 {
+		c.args = os.Args[1:]
+	}
+
 	return c
 }
 
