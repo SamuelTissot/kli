@@ -6,6 +6,9 @@ import (
 	"time"
 )
 
+// Arg
+// holds the pointer to the flag
+// also it's type
 type Arg struct {
 	Kind reflect.Kind
 	v    interface{}
