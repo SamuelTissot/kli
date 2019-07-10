@@ -3,17 +3,23 @@ package kli
 import (
 	"flag"
 	"fmt"
-	"os"
 	"reflect"
+	"strings"
 	"time"
 )
 
 type Command struct {
 	*flag.FlagSet
 	f        map[string]*Arg
+	desc     string
 	parent   *Command
 	children []*Command
 	fn       func(cmd *Command, globals map[string]*Arg) CmdError
+}
+
+// Description sets the command's description
+func (c *Command) Description(desc string) {
+	c.desc = desc
 }
 
 func NewCommand(name string, handling flag.ErrorHandling) *Command {
@@ -68,6 +74,16 @@ func (c *Command) Flag(name string) *Arg {
 	}
 
 	return nil
+}
+
+func (c *Command) PrintDefaults() {
+	divider := strings.Repeat("-", 18)
+	fmt.Println()
+	fmt.Printf(" %s\n", divider)
+	fmt.Printf(" %s - %s\n", strings.ToUpper(c.Name()), c.desc)
+	fmt.Printf(" %s\n", divider)
+	fmt.Println("  ARGS:")
+	c.FlagSet.PrintDefaults()
 }
 
 // Bool sets a flag of type Bool
@@ -128,15 +144,5 @@ func (c *Command) Uint64(name string, value uint64, usage string) {
 	c.f[name] = &Arg{
 		Kind: reflect.Uint64,
 		v:    c.FlagSet.Uint64(name, value, usage),
-	}
-}
-
-type Context struct {
-	Args []string
-}
-
-func (c *Context) Default() *Context {
-	return &Context{
-		Args: os.Args[1:],
 	}
 }

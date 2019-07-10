@@ -1,6 +1,7 @@
 package kli
 
 import (
+	"fmt"
 	"log"
 	"os"
 )
@@ -17,17 +18,15 @@ func (a *App) SetRoot(root *Command) {
 // Run runs the app with the given argument list
 // usually it's the os.Args[1:]
 func (a *App) Run(ctx *Context) {
-	if len(ctx.Args) == 0 {
-		log.Println("no argument list")
-		os.Exit(1)
-	}
 
-	if len(ctx.Args) == 1 {
+	if len(ctx.Args()) < 2 {
 		// only one argument, call the excute the root fnc right away
-		if err := a.root.fn(a.root, map[string]*Arg{}); err != nil {
-			log.Println(err.Error())
-			os.Exit(err.Code())
+		fmt.Println("no arguments, printing default")
+		a.root.PrintDefaults()
+		for _, c := range a.root.Children() {
+			c.PrintDefaults()
 		}
+		os.Exit(0)
 		return
 	}
 	// os.Arg[0] is the path
@@ -35,7 +34,7 @@ func (a *App) Run(ctx *Context) {
 	// since we want to be able to rename the command without changing
 	// the name of the root command
 	// always parse to root element flag since they are the globals
-	e := a.root.Parse(ctx.Args[1:])
+	e := a.root.Parse(ctx.Args()[1:])
 	if e != nil {
 		log.Printf("could not parse arguments: %s", e.Error())
 		os.Exit(1)
@@ -43,7 +42,7 @@ func (a *App) Run(ctx *Context) {
 	args := a.root.Args()
 	a.seen = []*Command{a.root}
 
-	if len(args) > 2 {
+	if len(args) >= 2 {
 		a.compute(a.root.Children(), args)
 	}
 	//args of the first command are the global
