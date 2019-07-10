@@ -17,7 +17,7 @@ func (c *Context) SetArgs(args []string) *Context {
 }
 
 func (c *Context) Default() *Context {
-	c.args = os.Args[2:]
+	c.args = os.Args[1:]
 	return c
 }
 

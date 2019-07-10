@@ -34,7 +34,7 @@ func (a *App) Run(ctx *Context) {
 	// since we want to be able to rename the command without changing
 	// the name of the root command
 	// always parse to root element flag since they are the globals
-	e := a.root.Parse(ctx.Args()[1:])
+	e := a.root.Parse(ctx.Args())
 	if e != nil {
 		log.Printf("could not parse arguments: %s", e.Error())
 		os.Exit(1)
