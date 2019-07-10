@@ -12,47 +12,52 @@ An Expressive command line interface.
 ### Usage
 
 ```go
-package main
+root := kli.NewCommand("cow", flag.ExitOnError)
+root.Bool("eat", false, "informs the cow to eat")
+root.Execute(func(cmd *kli.Command, _ map[string]*kli.Arg) kli.CmdError {
+    isEating, _ := cmd.Flag("eat").Bool()
+    if isEating {
+        fmt.Println(strings.Repeat("munch ", 3))
+    } else {
+        fmt.Println("the cow stands there looking smug")
+    }
+    return nil
+})
 
-import (
-	"flag"
-	"fmt"
-	"github.com/SamuelTissot/kli"
-)
+//declare the sub command
+sub := kli.NewCommand("say", flag.ExitOnError)
+sub.String("what", "mooooo", "what the cow will say")
+sub.Int("repeat", 1, "how many time it repeats the word")
+sub.Execute(func(command *kli.Command, globals map[string]*kli.Arg) kli.CmdError {
+    if eatFlg, ok := globals["eat"]; ok {
+        isEating, _ := eatFlg.Bool()
+        if isEating {
+            fmt.Println("munch... can't say anything, I'm eating")
+            return nil
+        }
+    }
 
-func main() {
-	
-	// declare the root command
-	root := kli.NewCommand("root", flag.ExitOnError)
-	root.String("foo", "", "the echoed string")
-	root.Execute(func(cmd *kli.Command, _ map[string]*kli.Arg) kli.CmdError {
-		foo, _ := cmd.Flag("foo").String()
-		fmt.Println(foo)
-		return nil
-	})
+    what, _ := command.Flag("what").String()
+    repeat, _ := command.Flag("repeat").Int()
+    for i := 1; i <= repeat; i++ {
+        fmt.Println(what)
+    }
+    return nil
+})
 
-	sub := kli.NewCommand("sub", flag.ExitOnError)
-	sub.String("str", "", "the echoed string value")
-	sub.Execute(func(command *kli.Command, globals map[string]*kli.Arg) kli.CmdError {
-		for n, arg := range globals {
-			v, _ := arg.String()
-			fmt.Printf("%s: %s\n", n, v)
-		}
+//add the subcommand to the root command
+err := root.SetChildren(sub)
+if err != nil {
+    panic(err)
+}
 
-	foo, _ := command.Flag("str").String()
-		fmt.Println(foo)
-		return nil
-	})
+//create the app with the root command
+app := &kli.App{}
+app.SetRoot(root)
 
-	err := root.SetChildren(sub)
-	if err != nil {
-		panic(err)
-	}
-
-	app := &kli.App{}
-	app.SetRoot(root)
-
-	app.Run(kli.NewContext().Default())
+//run the app with the context default
+// the context default are the os.Args
+app.Run(kli.NewContext().Default())
 }
 
 ```
