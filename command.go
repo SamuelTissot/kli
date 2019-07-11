@@ -1,8 +1,11 @@
 package kli
 
 import (
+	"bufio"
+	"bytes"
 	"flag"
 	"fmt"
+	"io"
 	"reflect"
 	"strings"
 	"time"
@@ -12,6 +15,7 @@ type Command struct {
 	*flag.FlagSet
 	f        map[string]*Arg
 	desc     string
+	usage    io.Reader
 	parent   *Command
 	children []*Command
 	fn       func(cmd *Command, globals map[string]*Arg) CmdError
@@ -77,13 +81,27 @@ func (c *Command) Flag(name string) *Arg {
 }
 
 func (c *Command) PrintDefaults() {
-	divider := strings.Repeat("-", 18)
-	fmt.Println()
-	fmt.Printf(" %s\n", divider)
-	fmt.Printf(" %s - %s\n", strings.ToUpper(c.Name()), c.desc)
-	fmt.Printf(" %s\n", divider)
-	fmt.Println("  ARGS:")
-	c.FlagSet.PrintDefaults()
+	b := bytes.Buffer{}
+	w := bufio.NewWriter(&b)
+	c.FlagSet.SetOutput(w)
+	padding := " "
+	divider := strings.Repeat("-", 78)
+	fmt.Fprintln(w)
+	fmt.Fprintf(w, "|%s\n", divider)
+	fmt.Fprintf(w, "| %s - %s\n", strings.ToUpper(c.Name()), c.desc)
+	fmt.Fprintf(w, "|%s\n", divider)
+	fmt.Fprintf(w, "\n%-1sARGS:\n%-1[1]s⎺⎺⎺\n", padding)
+	c.PrintDefaults()
+	if c.usage != nil {
+		fmt.Fprintf(w, "\n%-1sUSAGE:\n%-1[1]s⎺⎺⎺\n", padding)
+		scanner := bufio.NewScanner(c.usage)
+		for scanner.Scan() {
+			fmt.Fprintf(w, "%-2s%s\n", padding, scanner.Text())
+		}
+	}
+	w.Flush()
+	fmt.Println(b.String())
+
 	//print the child default
 	for _, child := range c.Children() {
 		child.PrintDefaults()
