@@ -15,7 +15,7 @@ type Command struct {
 	*flag.FlagSet
 	f        map[string]*Arg
 	desc     string
-	usage    io.Reader
+	detail   io.Reader
 	parent   *Command
 	children []*Command
 	fn       func(cmd *Command, globals map[string]*Arg) CmdError
@@ -26,8 +26,8 @@ func (c *Command) Description(desc string) {
 	c.desc = desc
 }
 
-func (c *Command) Usage(usage io.Reader) {
-	c.usage = usage
+func (c *Command) Detail(detail io.Reader) {
+	c.detail = detail
 }
 
 func NewCommand(name string, handling flag.ErrorHandling) *Command {
@@ -96,9 +96,9 @@ func (c *Command) PrintDefaults() {
 	_, _ = fmt.Fprintf(w, "|%s\n", divider)
 	_, _ = fmt.Fprintf(w, "\n%-1sARGS:\n%-1[1]s⎺⎺⎺\n", padding)
 	c.PrintDefaults()
-	if c.usage != nil {
+	if c.detail != nil {
 		_, _ = fmt.Fprintf(w, "\n%-1sUSAGE:\n%-1[1]s⎺⎺⎺\n", padding)
-		scanner := bufio.NewScanner(c.usage)
+		scanner := bufio.NewScanner(c.detail)
 		for scanner.Scan() {
 			_, _ = fmt.Fprintf(w, "%-2s%s\n", padding, scanner.Text())
 		}
