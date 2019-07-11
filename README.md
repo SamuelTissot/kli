@@ -1,6 +1,6 @@
 # kli
 
-An Expressive command line interface. 
+An Expressive command line interface builder. 
 
 ##### features
 - No creation of multiple flag pointers
@@ -11,7 +11,8 @@ An Expressive command line interface.
 
 ### Usage
 
-```go
+```
+
 //create the root command
 root := kli.NewCommand("cow", flag.ExitOnError)
 root.Bool("eat", false, "informs the cow to eat")
