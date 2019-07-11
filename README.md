@@ -2,7 +2,7 @@
 
 An Expressive command line interface. 
 
-#####features
+##### features
 - No creation of multiple flag pointers
 - Easy child/parent relashionships (sub-commands)
 - Support for global flags
@@ -12,6 +12,7 @@ An Expressive command line interface.
 ### Usage
 
 ```go
+//create the root command
 root := kli.NewCommand("cow", flag.ExitOnError)
 root.Bool("eat", false, "informs the cow to eat")
 root.Execute(func(cmd *kli.Command, _ map[string]*kli.Arg) kli.CmdError {
@@ -56,8 +57,7 @@ app := &kli.App{}
 app.SetRoot(root)
 
 //run the app with the context default
-// the context default are the os.Args
+//the context default are the os.Args
 app.Run(kli.NewContext().Default())
-}
 
 ```
