@@ -26,6 +26,10 @@ func (c *Command) Description(desc string) {
 	c.desc = desc
 }
 
+func (c *Command) Usage(usage io.Reader) {
+	c.usage = usage
+}
+
 func NewCommand(name string, handling flag.ErrorHandling) *Command {
 	return &Command{
 		FlagSet: flag.NewFlagSet(name, handling),
@@ -86,20 +90,20 @@ func (c *Command) PrintDefaults() {
 	c.FlagSet.SetOutput(w)
 	padding := " "
 	divider := strings.Repeat("-", 78)
-	fmt.Fprintln(w)
-	fmt.Fprintf(w, "|%s\n", divider)
-	fmt.Fprintf(w, "| %s - %s\n", strings.ToUpper(c.Name()), c.desc)
-	fmt.Fprintf(w, "|%s\n", divider)
-	fmt.Fprintf(w, "\n%-1sARGS:\n%-1[1]s⎺⎺⎺\n", padding)
+	_, _ = fmt.Fprintln(w)
+	_, _ = fmt.Fprintf(w, "|%s\n", divider)
+	_, _ = fmt.Fprintf(w, "| %s - %s\n", strings.ToUpper(c.Name()), c.desc)
+	_, _ = fmt.Fprintf(w, "|%s\n", divider)
+	_, _ = fmt.Fprintf(w, "\n%-1sARGS:\n%-1[1]s⎺⎺⎺\n", padding)
 	c.PrintDefaults()
 	if c.usage != nil {
-		fmt.Fprintf(w, "\n%-1sUSAGE:\n%-1[1]s⎺⎺⎺\n", padding)
+		_, _ = fmt.Fprintf(w, "\n%-1sUSAGE:\n%-1[1]s⎺⎺⎺\n", padding)
 		scanner := bufio.NewScanner(c.usage)
 		for scanner.Scan() {
-			fmt.Fprintf(w, "%-2s%s\n", padding, scanner.Text())
+			_, _ = fmt.Fprintf(w, "%-2s%s\n", padding, scanner.Text())
 		}
 	}
-	w.Flush()
+	_ = w.Flush()
 	fmt.Println(b.String())
 
 	//print the child default
