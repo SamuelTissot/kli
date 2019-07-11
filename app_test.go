@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/SamuelTissot/kli"
 	"github.com/SamuelTissot/kli/ktest"
+	"reflect"
 	"strings"
 	"testing"
 )
@@ -17,21 +18,23 @@ func TestApp_ParseSubCommands_withGlobalFlags(t *testing.T) {
 		root := kli.NewCommand("root", flag.ExitOnError)
 		root.String("foo", "", "the echoed string")
 		root.String("homer", "", "the echoed string")
-		root.Execute(func(cmd *kli.Command, _ map[string]*kli.Arg) kli.CmdError {
-			foo, _ := cmd.Flag("foo").String()
+		root.Execute(func(cmd *kli.Command, _ *kli.KFlag) kli.CmdError {
+			foo, _ := cmd.StringFlag("foo")
 			fmt.Println(foo)
 			return nil
 		})
 
 		sub := kli.NewCommand("sub", flag.ExitOnError)
 		sub.String("str", "", "the echoed string value")
-		sub.Execute(func(command *kli.Command, globals map[string]*kli.Arg) kli.CmdError {
-			for n, arg := range globals {
-				v, _ := arg.String()
-				fmt.Printf("%s: %s\n", n, v)
+		sub.Execute(func(command *kli.Command, globals *kli.KFlag) kli.CmdError {
+			for n, t := range globals.Flags() {
+				if t == reflect.String {
+					v, _ := globals.StringFlag(n)
+					fmt.Printf("%s: %s\n", n, v)
+				}
 			}
 
-			foo, _ := command.Flag("str").String()
+			foo, _ := command.StringFlag("str")
 			fmt.Println(foo)
 			return nil
 		})
@@ -43,12 +46,14 @@ func TestApp_ParseSubCommands_withGlobalFlags(t *testing.T) {
 
 		third := kli.NewCommand("third", flag.ExitOnError)
 		third.String("cup", "", "the echoed string value")
-		third.Execute(func(command *kli.Command, globals map[string]*kli.Arg) kli.CmdError {
-			for n, arg := range globals {
-				v, _ := arg.String()
-				fmt.Printf("%s: %s\n", n, v)
+		third.Execute(func(command *kli.Command, globals *kli.KFlag) kli.CmdError {
+			for n, t := range globals.Flags() {
+				if t == reflect.String {
+					v, _ := globals.StringFlag(n)
+					fmt.Printf("%s: %s\n", n, v)
+				}
 			}
-			foo, _ := command.Flag("cup").String()
+			foo, _ := command.StringFlag("cup")
 			fmt.Print("the cup of " + foo)
 			return nil
 		})
@@ -92,22 +97,19 @@ func TestApp_noArgs(t *testing.T) {
 		root.Description("all of your root needs")
 		root.String("foo", "", "the echoed string")
 		root.String("homer", "", "the echoed string")
-		root.Execute(func(cmd *kli.Command, _ map[string]*kli.Arg) kli.CmdError {
-			foo, _ := cmd.Flag("foo").String()
-			fmt.Println(foo)
-			return nil
-		})
 
 		sub := kli.NewCommand("sub", flag.ExitOnError)
 		sub.Description("a sub command, yeah!")
 		sub.String("str", "", "the echoed string value")
-		sub.Execute(func(command *kli.Command, globals map[string]*kli.Arg) kli.CmdError {
-			for n, arg := range globals {
-				v, _ := arg.String()
-				fmt.Printf("%s: %s\n", n, v)
+		sub.Execute(func(command *kli.Command, globals *kli.KFlag) kli.CmdError {
+			for n, t := range globals.Flags() {
+				if t == reflect.String {
+					v, _ := globals.StringFlag(n)
+					fmt.Printf("%s: %s\n", n, v)
+				}
 			}
 
-			foo, _ := command.Flag("str").String()
+			foo, _ := command.StringFlag("str")
 			fmt.Println(foo)
 			return nil
 		})
@@ -149,8 +151,8 @@ func TestApp_Help(t *testing.T) {
 		root.Description("all of your root needs")
 		root.String("foo", "", "the echoed string")
 		root.String("homer", "", "the echoed string")
-		root.Execute(func(cmd *kli.Command, _ map[string]*kli.Arg) kli.CmdError {
-			foo, _ := cmd.Flag("foo").String()
+		root.Execute(func(cmd *kli.Command, _ *kli.KFlag) kli.CmdError {
+			foo, _ := cmd.StringFlag("foo")
 			fmt.Println(foo)
 			return nil
 		})
@@ -158,13 +160,15 @@ func TestApp_Help(t *testing.T) {
 		sub := kli.NewCommand("sub", flag.ExitOnError)
 		sub.Description("a sub command, yeah!")
 		sub.String("str", "", "the echoed string value")
-		sub.Execute(func(command *kli.Command, globals map[string]*kli.Arg) kli.CmdError {
-			for n, arg := range globals {
-				v, _ := arg.String()
-				fmt.Printf("%s: %s\n", n, v)
+		sub.Execute(func(command *kli.Command, globals *kli.KFlag) kli.CmdError {
+			for n, t := range globals.Flags() {
+				if t == reflect.String {
+					v, _ := globals.StringFlag(n)
+					fmt.Printf("%s: %s\n", n, v)
+				}
 			}
 
-			foo, _ := command.Flag("str").String()
+			foo, _ := command.StringFlag("str")
 			fmt.Println(foo)
 			return nil
 		})

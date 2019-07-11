@@ -15,8 +15,8 @@ An Expressive command line interface.
 //create the root command
 root := kli.NewCommand("cow", flag.ExitOnError)
 root.Bool("eat", false, "informs the cow to eat")
-root.Execute(func(cmd *kli.Command, _ map[string]*kli.Arg) kli.CmdError {
-    isEating, _ := cmd.Flag("eat").Bool()
+root.Execute(func(cmd *kli.Command, _ *kli.KFlag) kli.CmdError {
+    isEating, _ := cmd.BoolFlag("eat")
     if isEating {
         fmt.Println(strings.Repeat("munch ", 3))
     } else {
@@ -29,17 +29,16 @@ root.Execute(func(cmd *kli.Command, _ map[string]*kli.Arg) kli.CmdError {
 sub := kli.NewCommand("say", flag.ExitOnError)
 sub.String("what", "mooooo", "what the cow will say")
 sub.Int("repeat", 1, "how many time it repeats the word")
-sub.Execute(func(command *kli.Command, globals map[string]*kli.Arg) kli.CmdError {
-    if eatFlg, ok := globals["eat"]; ok {
-        isEating, _ := eatFlg.Bool()
+sub.Execute(func(cmd *kli.Command, globals *kli.KFlag) kli.CmdError {
+    if isEating, ok := globals.BoolFlag("eat"); ok {
         if isEating {
             fmt.Println("munch... can't say anything, I'm eating")
             return nil
         }
     }
 
-    what, _ := command.Flag("what").String()
-    repeat, _ := command.Flag("repeat").Int()
+    what, _ := cmd.StringFlag("what")
+    repeat, _ := cmd.IntFlag("repeat")
     for i := 1; i <= repeat; i++ {
         fmt.Println(what)
     }
@@ -57,7 +56,7 @@ app := &kli.App{}
 app.SetRoot(root)
 
 //run the app with the context default
-//the context default are the os.Args
+// the context default are the os.Args
 app.Run(kli.NewContext().Default())
 
 ```

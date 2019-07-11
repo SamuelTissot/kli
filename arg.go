@@ -1,100 +1,119 @@
 package kli
 
 import (
-	"fmt"
 	"reflect"
 	"time"
 )
 
-// Arg
-// holds the pointer to the flag
-// also it's type
-type Arg struct {
-	Kind reflect.Kind
-	v    interface{}
+type KFlag struct {
+	f map[string]interface{}
 }
 
-func (a *Arg) ofKind(t reflect.Kind) error {
-	if t != a.Kind {
-		return fmt.Errorf("arg trying to get value as type %T but type is %T", t, a.Kind)
+func NewArg() *KFlag {
+	return &KFlag{map[string]interface{}{}}
+}
+
+// Flags returns a list of flags
+func (a *KFlag) Flags() map[string]reflect.Kind {
+	result := make(map[string]reflect.Kind)
+	for name, f := range a.f {
+		result[name] = reflect.TypeOf(f).Elem().Kind()
 	}
-	return nil
+	return result
 }
 
-func (a *Arg) elem() reflect.Value {
-	return reflect.ValueOf(a.v).Elem()
-}
-
-// Bool returns the boolean value of the Arg
-// and error is return if trying to get a value of the
-// wrong Type
-func (a *Arg) Bool() (bool, error) {
-	if err := a.ofKind(reflect.Bool); err != nil {
-		return false, err
+// flagElem returns the KFlag for the given name
+func (a *KFlag) flagElem(name string) reflect.Value {
+	if f, ok := a.f[name]; ok {
+		e := reflect.ValueOf(f).Elem()
+		return e
 	}
-
-	return a.elem().Bool(), nil
+	return reflect.Value{}
 }
 
-// Duration returns the duration value of Arg
-func (a *Arg) Duration(unit time.Duration) (time.Duration, error) {
-	if err := a.ofKind(reflect.Int64); err != nil {
-		return 0, fmt.Errorf("arg trying to get value as type time.Duration but type is %T", a.Kind)
+// BoolFlag return the value of the flag "name"
+// ok is false if the flag does not exist or of wrong type
+func (a *KFlag) BoolFlag(name string) (value, ok bool) {
+	f := a.flagElem(name)
+	if f.Kind() != reflect.Bool {
+		return
 	}
-
-	return time.Duration(a.elem().Int()), nil
+	return f.Bool(), true
 }
 
-// Float64 returns the fload64 value of Arg
-func (a *Arg) Float64() (float64, error) {
-	if err := a.ofKind(reflect.Float64); err != nil {
-		return 0, err
-	}
-
-	return a.elem().Float(), nil
-}
-
-// Int returns the int value of Arg
-func (a *Arg) Int() (int, error) {
-	if err := a.ofKind(reflect.Int); err != nil {
-		return 0, err
+// DurationFlag return the value of the flag "name"
+// ok is false if the flag does not exist or of wrong type
+func (a *KFlag) DurationFlag(name string) (value time.Duration, ok bool) {
+	f := a.flagElem(name)
+	if f.Kind() != reflect.String {
+		return
 	}
 
-	return int(a.elem().Int()), nil
-}
-
-// Int64 returns the int64 value of Arg
-func (a *Arg) Int64() (int64, error) {
-	if err := a.ofKind(reflect.Int64); err != nil {
-		return 0, err
+	d, e := time.ParseDuration(f.String())
+	if e != nil {
+		return
 	}
 
-	return a.elem().Int(), nil
+	return d, true
 }
 
-// String returns the string value of Arg
-func (a *Arg) String() (string, error) {
-	if err := a.ofKind(reflect.String); err != nil {
-		return "", err
+// Float64Flag return the value of the flag "name"
+// ok is false if the flag does not exist or of wrong type
+func (a *KFlag) Float64Flag(name string) (value float64, ok bool) {
+	f := a.flagElem(name)
+	if f.Kind() != reflect.Float64 {
+		return
 	}
-
-	return a.elem().String(), nil
+	return f.Float(), true
 }
 
-// Uint returns the uint value of Arg
-func (a *Arg) Uint() (uint, error) {
-	if err := a.ofKind(reflect.Uint); err != nil {
-		return 0, err
+// IntFlag return the value of the flag "name"
+// ok is false if the flag does not exist or of wrong type
+func (a *KFlag) IntFlag(name string) (value int, ok bool) {
+	f := a.flagElem(name)
+	if f.Kind() != reflect.Int {
+		return
 	}
-
-	return uint(a.elem().Uint()), nil
+	return int(f.Int()), true
 }
 
-// Uint64 returns the uint64 value of Arg
-func (a *Arg) Uint64() (uint64, error) {
-	if err := a.ofKind(reflect.Uint64); err != nil {
-		return 0, err
+// Int64Flag return the value of the flag "name"
+// ok is false if the flag does not exist or of wrong type
+func (a *KFlag) Int64Flag(name string) (value int64, ok bool) {
+	f := a.flagElem(name)
+	if f.Kind() != reflect.Int64 {
+		return
+	}
+	return f.Int(), true
+}
+
+// StringFlag return the value of the flag "name"
+// ok is false if the flag does not exist or of wrong type
+func (a *KFlag) StringFlag(name string) (value string, ok bool) {
+	f := a.flagElem(name)
+	if f.Kind() != reflect.String {
+		return
 	}
 
-	return a.elem().Uint(), nil
+	return f.String(), true
+}
+
+// UintFlag return the value of the flag "name"
+// ok is false if the flag does not exist or of wrong type
+func (a *KFlag) UintFlag(name string) (value uint, ok bool) {
+	f := a.flagElem(name)
+	if f.Kind() != reflect.Uint {
+		return
+	}
+	return uint(f.Uint()), true
+}
+
+// Uint64Flag return the value of the flag "name"
+// ok is false if the flag does not exist or of wrong type
+func (a *KFlag) Uint64Flag(name string) (value uint64, ok bool) {
+	f := a.flagElem(name)
+	if f.Kind() != reflect.Uint64 {
+		return
+	}
+	return f.Uint(), true
 }

@@ -54,7 +54,7 @@ func (a *App) Run(ctx *Context) {
 	if last.fn == nil {
 		last.PrintDefaults()
 	} else {
-		err := last.fn(last, first.f)
+		err := last.fn(last, first.KFlag)
 		if err != nil {
 			log.Println(err.Error())
 			os.Exit(err.Code())
