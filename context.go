@@ -20,7 +20,7 @@ func (c *Context) SetArgs(args []string) *Context {
 
 func (c *Context) Default() *Context {
 	//only take the arguments we don't care about the name of the command
-	if len(os.Args) > 2 {
+	if len(os.Args) > 1 {
 		c.args = os.Args[1:]
 	}
 
