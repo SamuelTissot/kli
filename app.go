@@ -48,17 +48,14 @@ func (a *App) Run(ctx *Context) {
 	last := a.seen[len(a.seen)-1]
 	if !last.IsExecutable() {
 		log.Printf("command %s does not have an executing method", last.Name())
+		last.PrintDefaults()
 		os.Exit(1)
 	}
 
-	if !last.IsExecutable() {
-		last.PrintDefaults()
-	} else {
-		err := last.Execute(last, first.GetKFlag())
-		if err != nil {
-			log.Println(err.Error())
-			os.Exit(err.Code())
-		}
+	err := last.Execute(last, first.GetKFlag())
+	if err != nil {
+		log.Println(err.Error())
+		os.Exit(err.Code())
 	}
 
 	os.Exit(0)
