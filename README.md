@@ -9,6 +9,12 @@ An Expressive command line interface builder.
 - easy to test
 - expressive command declaration 
 
+
+#### NOTE
+**still in early development**
+
+---
+
 ### Usage
 
 ```go
