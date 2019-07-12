@@ -11,7 +11,7 @@ func main() {
 	// declare the root command
 	root := kli.NewCommand("cow", flag.ExitOnError)
 	root.Bool("eat", false, "informs the cow to eat")
-	root.Do(func(cmd kli.Command, _ kli.KFlag) kli.KError {
+	root.Do(func(cmd kli.Command, _ kli.KFlag) kli.Error {
 		isEating, _ := cmd.BoolFlag("eat")
 		if isEating {
 			fmt.Println(strings.Repeat("munch ", 3))
@@ -25,7 +25,7 @@ func main() {
 	sub := kli.NewCommand("say", flag.ExitOnError)
 	sub.String("what", "mooooo", "what the cow will say")
 	sub.Int("repeat", 1, "how many time it repeats the word")
-	sub.Do(func(cmd kli.Command, globals kli.KFlag) kli.KError {
+	sub.Do(func(cmd kli.Command, globals kli.KFlag) kli.Error {
 		if isEating, ok := globals.BoolFlag("eat"); ok {
 			if isEating {
 				fmt.Println("munch... can't say anything, I'm eating")

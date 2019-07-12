@@ -22,7 +22,7 @@ type Command interface {
 	Detail(detail io.Reader)
 
 	// Do sets the function to be called on execution
-	Do(fn func(Command, KFlag) KError)
+	Do(fn func(Command, KFlag) Error)
 
 	// Parse parses flag definitions from the argument
 	// list, which should not include the command name.
@@ -38,9 +38,9 @@ type Command interface {
 	Name() string
 
 	// Execute calls the function that what set by Command::Do
-	// returns a KError function not found if the
+	// returns a Error function not found if the
 	// execute function was not set
-	Execute(Command, KFlag) KError
+	Execute(Command, KFlag) Error
 
 	// IsExecutable returns true if the command executing
 	// function has been set
@@ -95,7 +95,7 @@ type CMD struct {
 	detail   io.Reader
 	parent   Command
 	children []Command
-	fn       func(cmd Command, globals KFlag) KError
+	fn       func(cmd Command, globals KFlag) Error
 }
 
 // Description sets the command's description
@@ -122,13 +122,13 @@ func NewSubCommand(parent Command, name string, handling flag.ErrorHandling) *CM
 	}
 }
 
-func (c *CMD) Do(fn func(Command, KFlag) KError) {
+func (c *CMD) Do(fn func(Command, KFlag) Error) {
 	c.fn = fn
 }
 
-func (c *CMD) Execute(cmd Command, f KFlag) KError {
+func (c *CMD) Execute(cmd Command, f KFlag) Error {
 	if !c.IsExecutable() {
-		return Error(nil, "executable function not set", CannotExecute)
+		return ErrorWrap(nil, "executable function not set", CannotExecute)
 	}
 	return c.fn(cmd, f)
 }

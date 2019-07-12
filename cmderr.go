@@ -17,27 +17,27 @@ const (
 	OutOfRange      = 255 //*	Exit status out of range	exit -1	exit takes only integer args in the range 0 - 255
 )
 
-type KError interface {
+type Error interface {
 	error
 	Code() int
 }
 
-type CommandErr struct {
+type KError struct {
 	e error
 	c int
 }
 
-func Error(err error, text string, code int) *CommandErr {
-	return &CommandErr{
+func ErrorWrap(err error, text string, code int) *KError {
+	return &KError{
 		e: errw.Wrap(err, text),
 		c: code,
 	}
 }
 
-func (e CommandErr) Error() string {
+func (e KError) Error() string {
 	return e.Error()
 }
 
-func (e CommandErr) Code() int {
+func (e KError) Code() int {
 	return e.c
 }
