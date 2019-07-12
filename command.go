@@ -107,14 +107,14 @@ func (c *CMD) Detail(detail io.Reader) {
 	c.detail = detail
 }
 
-func NewCommand(name string, handling flag.ErrorHandling) Command {
+func NewCommand(name string, handling flag.ErrorHandling) *CMD {
 	return &CMD{
 		FlagSet: flag.NewFlagSet(name, handling),
 		KFlag:   NewKflag(),
 	}
 }
 
-func NewSubCommand(parent Command, name string, handling flag.ErrorHandling) Command {
+func NewSubCommand(parent Command, name string, handling flag.ErrorHandling) *CMD {
 	return &CMD{
 		FlagSet: flag.NewFlagSet(name, handling),
 		KFlag:   NewKflag(),

@@ -49,7 +49,7 @@ type FlagStore struct {
 	f map[string]interface{}
 }
 
-func NewKflag() KFlag {
+func NewKflag() *FlagStore {
 	return &FlagStore{map[string]interface{}{}}
 }
 
