@@ -46,10 +46,10 @@ func NewErrorf(code int, format string, a ...interface{}) *KError {
 	}
 }
 
-func (e KError) Error() string {
-	return e.Error()
+func (ke KError) Error() string {
+	return ke.Error()
 }
 
-func (e KError) Code() int {
-	return e.c
+func (ke KError) Code() int {
+	return ke.c
 }
