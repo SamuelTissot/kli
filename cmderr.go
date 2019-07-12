@@ -47,7 +47,7 @@ func NewErrorf(code int, format string, a ...interface{}) *KError {
 }
 
 func (ke KError) Error() string {
-	return ke.Error()
+	return ke.e.Error()
 }
 
 func (ke KError) Code() int {
