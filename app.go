@@ -39,7 +39,7 @@ func (a *App) Run(ctx *Context) {
 	args := a.root.Args()
 	a.seen = []Command{a.root}
 
-	if len(args) >= 2 {
+	if len(args) >= 1 {
 		a.compute(a.root.Children(), args)
 	}
 	//args of the first command are the global
