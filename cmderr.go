@@ -1,6 +1,7 @@
 package kli
 
 import (
+	"fmt"
 	errw "github.com/pkg/errors"
 )
 
@@ -30,6 +31,17 @@ type KError struct {
 func ErrorWrap(err error, text string, code int) *KError {
 	return &KError{
 		e: errw.Wrap(err, text),
+		c: code,
+	}
+}
+
+func NewError(text string, code int) *KError {
+	return NewErrorf(code, text)
+}
+
+func NewErrorf(code int, format string, a ...interface{}) *KError {
+	return &KError{
+		e: fmt.Errorf(format, a...),
 		c: code,
 	}
 }
