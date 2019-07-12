@@ -1,6 +1,8 @@
 package kli
 
-import "fmt"
+import (
+	errw "github.com/pkg/errors"
+)
 
 // unix command error code as per
 // https://www.tldp.org/LDP/abs/html/exitcodes.html
@@ -15,32 +17,27 @@ const (
 	OutOfRange      = 255 //*	Exit status out of range	exit -1	exit takes only integer args in the range 0 - 255
 )
 
-type CmdError interface {
+type KError interface {
 	error
-	fmt.Stringer
 	Code() int
 }
 
 type CommandErr struct {
-	s string
+	e error
 	c int
 }
 
-func NewCmdError(message string, code int) *CommandErr {
+func Error(err error, text string, code int) *CommandErr {
 	return &CommandErr{
-		s: message,
+		e: errw.Wrap(err, text),
 		c: code,
 	}
 }
 
 func (e CommandErr) Error() string {
-	return e.s
+	return e.Error()
 }
 
 func (e CommandErr) Code() int {
 	return e.c
-}
-
-func (e CommandErr) String() string {
-	return fmt.Sprintf("error, code: %d, message: %s", e.c, e.s)
 }
