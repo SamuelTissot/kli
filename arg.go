@@ -9,7 +9,7 @@ type KFlag struct {
 	f map[string]interface{}
 }
 
-func NewArg() *KFlag {
+func NewKflag() *KFlag {
 	return &KFlag{map[string]interface{}{}}
 }
 

@@ -32,7 +32,15 @@ func (c *Command) Detail(detail io.Reader) {
 func NewCommand(name string, handling flag.ErrorHandling) *Command {
 	return &Command{
 		FlagSet: flag.NewFlagSet(name, handling),
-		KFlag:   NewArg(),
+		KFlag:   NewKflag(),
+	}
+}
+
+func NewSubCommand(parent *Command, name string, handling flag.ErrorHandling) *Command {
+	return &Command{
+		FlagSet: flag.NewFlagSet(name, handling),
+		KFlag:   NewKflag(),
+		parent:  parent,
 	}
 }
 
