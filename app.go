@@ -7,11 +7,11 @@ import (
 )
 
 type App struct {
-	root *Command
-	seen []*Command
+	root Command
+	seen []Command
 }
 
-func (a *App) SetRoot(root *Command) {
+func (a *App) SetRoot(root Command) {
 	a.root = root
 }
 
@@ -19,7 +19,7 @@ func (a *App) SetRoot(root *Command) {
 // usually it's the os.Args[1:]
 func (a *App) Run(ctx *Context) {
 
-	if len(ctx.Args()) == 0 && a.root.fn == nil {
+	if len(ctx.Args()) == 0 && !a.root.IsExecutable() {
 		// only one argument, call the excute the root fnc right away
 		fmt.Println("no arguments, printing default")
 		a.root.PrintDefaults()
@@ -37,7 +37,7 @@ func (a *App) Run(ctx *Context) {
 		os.Exit(1)
 	}
 	args := a.root.Args()
-	a.seen = []*Command{a.root}
+	a.seen = []Command{a.root}
 
 	if len(args) >= 2 {
 		a.compute(a.root.Children(), args)
@@ -46,15 +46,15 @@ func (a *App) Run(ctx *Context) {
 	first := a.seen[0]
 	// the last command is the one to execute
 	last := a.seen[len(a.seen)-1]
-	if last.fn == nil {
+	if !last.IsExecutable() {
 		log.Printf("command %s does not have an executing method", last.Name())
 		os.Exit(1)
 	}
 
-	if last.fn == nil {
+	if !last.IsExecutable() {
 		last.PrintDefaults()
 	} else {
-		err := last.fn(last, first.KFlag)
+		err := last.Execute(last, first.GetKFlag())
 		if err != nil {
 			log.Println(err.Error())
 			os.Exit(err.Code())
@@ -64,7 +64,7 @@ func (a *App) Run(ctx *Context) {
 	os.Exit(0)
 }
 
-func (a *App) compute(cmds []*Command, args []string) {
+func (a *App) compute(cmds []Command, args []string) {
 	if len(args) < 1 {
 		return
 	}

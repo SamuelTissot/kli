@@ -18,7 +18,7 @@ func TestApp_ParseSubCommands_withGlobalFlags(t *testing.T) {
 		root := kli.NewCommand("root", flag.ExitOnError)
 		root.String("foo", "", "the echoed string")
 		root.String("homer", "", "the echoed string")
-		root.Execute(func(cmd *kli.Command, _ *kli.KFlag) kli.CmdError {
+		root.Do(func(cmd kli.Command, _ kli.KFlag) kli.CmdError {
 			foo, _ := cmd.StringFlag("foo")
 			fmt.Println(foo)
 			return nil
@@ -26,8 +26,8 @@ func TestApp_ParseSubCommands_withGlobalFlags(t *testing.T) {
 
 		sub := kli.NewCommand("sub", flag.ExitOnError)
 		sub.String("str", "", "the echoed string value")
-		sub.Execute(func(command *kli.Command, globals *kli.KFlag) kli.CmdError {
-			for n, t := range globals.Flags() {
+		sub.Do(func(command kli.Command, globals kli.KFlag) kli.CmdError {
+			for n, t := range globals.Store() {
 				if t == reflect.String {
 					v, _ := globals.StringFlag(n)
 					fmt.Printf("%s: %s\n", n, v)
@@ -46,8 +46,8 @@ func TestApp_ParseSubCommands_withGlobalFlags(t *testing.T) {
 
 		third := kli.NewCommand("third", flag.ExitOnError)
 		third.String("cup", "", "the echoed string value")
-		third.Execute(func(command *kli.Command, globals *kli.KFlag) kli.CmdError {
-			for n, t := range globals.Flags() {
+		third.Do(func(command kli.Command, globals kli.KFlag) kli.CmdError {
+			for n, t := range globals.Store() {
 				if t == reflect.String {
 					v, _ := globals.StringFlag(n)
 					fmt.Printf("%s: %s\n", n, v)
@@ -101,8 +101,8 @@ func TestApp_noArgs(t *testing.T) {
 		sub := kli.NewCommand("sub", flag.ExitOnError)
 		sub.Description("a sub command, yeah!")
 		sub.String("str", "", "the echoed string value")
-		sub.Execute(func(command *kli.Command, globals *kli.KFlag) kli.CmdError {
-			for n, t := range globals.Flags() {
+		sub.Do(func(command kli.Command, globals kli.KFlag) kli.CmdError {
+			for n, t := range globals.Store() {
 				if t == reflect.String {
 					v, _ := globals.StringFlag(n)
 					fmt.Printf("%s: %s\n", n, v)
@@ -151,7 +151,7 @@ func TestApp_Help(t *testing.T) {
 		root.Description("all of your root needs")
 		root.String("foo", "", "the echoed string")
 		root.String("homer", "", "the echoed string")
-		root.Execute(func(cmd *kli.Command, _ *kli.KFlag) kli.CmdError {
+		root.Do(func(cmd kli.Command, _ kli.KFlag) kli.CmdError {
 			foo, _ := cmd.StringFlag("foo")
 			fmt.Println(foo)
 			return nil
@@ -160,8 +160,8 @@ func TestApp_Help(t *testing.T) {
 		sub := kli.NewCommand("sub", flag.ExitOnError)
 		sub.Description("a sub command, yeah!")
 		sub.String("str", "", "the echoed string value")
-		sub.Execute(func(command *kli.Command, globals *kli.KFlag) kli.CmdError {
-			for n, t := range globals.Flags() {
+		sub.Do(func(command kli.Command, globals kli.KFlag) kli.CmdError {
+			for n, t := range globals.Store() {
 				if t == reflect.String {
 					v, _ := globals.StringFlag(n)
 					fmt.Printf("%s: %s\n", n, v)
