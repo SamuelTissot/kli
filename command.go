@@ -10,6 +10,8 @@ import (
 	"time"
 )
 
+var indent = 1
+
 // todo review the interface ... it's quite big
 type Command interface {
 	KFlag
@@ -179,19 +181,25 @@ func (c *CMD) PrintDefaults() {
 	b := bytes.Buffer{}
 	w := bufio.NewWriter(&b)
 	c.FlagSet.SetOutput(w)
-	padding := " "
-	divider := strings.Repeat("-", 78)
+	padding := strings.Repeat(" ", indent*2)
 	_, _ = fmt.Fprintln(w)
-	_, _ = fmt.Fprintf(w, "|%s\n", divider)
-	_, _ = fmt.Fprintf(w, "| %s - %s\n", strings.ToUpper(c.Name()), c.desc)
-	_, _ = fmt.Fprintf(w, "|%s\n", divider)
-	_, _ = fmt.Fprintf(w, "\n%-1sARGS:\n%-1[1]s⎺⎺⎺\n", padding)
-	c.FlagSet.PrintDefaults()
+	_, _ = fmt.Fprintf(w, "%s‣ %s : %s\n%s%s\n", padding, strings.ToUpper(c.Name()), c.desc, padding, strings.Repeat("⎺", len(c.Name()+c.desc)+8))
+
+	//output the command flag
+	flagHeader := true
+	c.FlagSet.VisitAll(func(f *flag.Flag) {
+		if flagHeader {
+			_, _ = fmt.Fprintf(w, "%sarguments:\n", padding)
+			flagHeader = false
+		}
+		_, _ = fmt.Fprintf(w, "%s-%s\t%s (default: %s)\n", strings.Repeat(" ", indent*4), f.Name, f.Usage, f.DefValue)
+	})
+
 	if c.detail != nil {
-		_, _ = fmt.Fprintf(w, "\n%-1sUSAGE:\n%-1[1]s⎺⎺⎺\n", padding)
+		_, _ = fmt.Fprintf(w, "%susage:\n", padding)
 		scanner := bufio.NewScanner(c.detail)
 		for scanner.Scan() {
-			_, _ = fmt.Fprintf(w, "%-2s%s\n", padding, scanner.Text())
+			_, _ = fmt.Fprintf(w, "%s%s\n", strings.Repeat(" ", indent*4), scanner.Text())
 		}
 	}
 	_ = w.Flush()
@@ -199,7 +207,9 @@ func (c *CMD) PrintDefaults() {
 
 	//print the child default
 	for _, child := range c.Children() {
+		indent++
 		child.PrintDefaults()
+		indent--
 	}
 }
 
